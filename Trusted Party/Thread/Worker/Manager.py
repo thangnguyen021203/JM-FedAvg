@@ -78,7 +78,7 @@ class Manager():
         self.aggregator_info = None
             # Public parameters
         # self.commiter = Commiter()
-        self.current_round = 1
+        self.current_round = 0
         # self.last_commitment: numpy.ndarray[numpy.int64] = None
         self.gs_mask = random.randint(1, 2 ** 64)
             # Controller

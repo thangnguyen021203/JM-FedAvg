@@ -18,13 +18,16 @@ def listener_thread(manager: Manager):
 
         # Aggregator/Client aborts the process due to abnormal activities
         if b'STOP' == data[:4]:
-
-            verification_round_number, message = data[5:].split(b' ', 1)
-            if int(verification_round_number) != manager.round_number:
-                manager.abort("Get the STOP signal with wrong round number")
-            else:
-                print("STOP due to " + message.decode())
+            if len(data) == 4:
+                print("STOP")
                 manager.set_flag(manager.FLAG.STOP)
+            else:    
+                verification_round_number, message = data[5:].split(b' ', 1)
+                if int(verification_round_number) != manager.round_number:
+                    manager.abort(f"Get the STOP signal with wrong round number, verification round number {int(verification_round_number)}, round number {manager.round_number}")
+                else:
+                    print("STOP due to " + message.decode())
+                    manager.set_flag(manager.FLAG.STOP)
             writer.close()
             return
 

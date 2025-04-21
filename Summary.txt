@@ -1,2 +1,0 @@
-Training completed successfully in 14 rounds
-Total time to convergence: 659.1614162921906 seconds

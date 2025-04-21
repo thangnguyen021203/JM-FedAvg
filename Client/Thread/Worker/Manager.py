@@ -155,6 +155,7 @@ class Manager:
 
     def abort(self, message: str):
         self.abort_message = message
+        print(message)
         self.set_flag(self.FLAG.ABORT)
     
     def start_train(self):

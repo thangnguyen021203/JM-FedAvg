@@ -19,7 +19,7 @@ def controller_thread(manager: Manager):
 
         if flag == manager.FLAG.STOP:
 
-            print("Got the ABORT signal, send the STOP signal...")
+            print("Send the STOP signal...")
             sys.exit()
 
         # When training is complete, send STOP signals to all clients and Aggregator
@@ -46,6 +46,8 @@ def controller_thread(manager: Manager):
         # Init the round
         elif flag == manager.FLAG.START_ROUND:
             
+            manager.current_round += 1
+
             if manager.current_round == 1:
                 total_time_convergence = time()
 
@@ -55,7 +57,6 @@ def controller_thread(manager: Manager):
             asyncio.run(send_ROUND_INFO_aggregator(manager))
 
             # Increment the round number after starting a new round
-            manager.current_round += 1
         else:
 
             pass

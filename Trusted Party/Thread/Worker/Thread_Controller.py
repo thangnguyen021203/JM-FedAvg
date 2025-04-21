@@ -13,7 +13,10 @@ async def send_STOP(manager: Manager):
     for client in manager.client_list:
         reader, writer = await asyncio.open_connection(client.host, client.port)
         _ = await reader.read(3)  # Remove first 3 bytes of Telnet command
-        await Helper.send_data(writer, f"STOP {manager.current_round} {manager.stop_message}")
+        if client.ID in manager.participated_clients:
+            await Helper.send_data(writer, f"STOP {manager.current_round} {manager.stop_message}")
+        else:
+            await Helper.send_data(writer, f"STOP")
         writer.close()
 
     reader, writer = await asyncio.open_connection(manager.aggregator_info.host, manager.aggregator_info.port)

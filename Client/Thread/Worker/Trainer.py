@@ -40,18 +40,22 @@ class Trainer:
         self.data_num = len(self.root_train_data) // subset_num
         start = ((round_number * ATTEND_CLIENTS + self.ID) * self.data_num) % len(self.root_train_data)
         end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.data_num) % len(self.root_train_data)
+
         if start < end:
-            self.self_train_data = Subset(self.root_train_data, range(start, end))
+            indices = range(start, end)
         else:
-            self.self_train_data = Subset(self.root_train_data, range(end, start))
+            indices = list(range(start, len(self.root_train_data))) + list(range(0, end))
+        self.self_train_data = Subset(self.root_train_data, indices)
 
         self.test_data_num = len(self.root_test_data) // subset_num
         test_start = ((round_number * ATTEND_CLIENTS + self.ID) * self.test_data_num) % len(self.root_test_data)
         test_end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.test_data_num) % len(self.root_test_data)
-        if start < end:
-            self.self_test_data = Subset(self.root_test_data, range(test_start, test_end))
+
+        if test_start < test_end:
+            test_indices = range(test_start, test_end)
         else:
-            self.self_train_data = Subset(self.root_test_data, range(test_end, test_start))
+            test_indices = list(range(test_start, len(self.root_test_data))) + list(range(0, test_end))
+        self.self_test_data = Subset(self.root_test_data, test_indices)
 
     @Helper.timing
     def load_parameters(self, parameters: numpy.ndarray[numpy.float32], round_ID: int):

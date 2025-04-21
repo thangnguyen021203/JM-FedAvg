@@ -131,7 +131,7 @@ class Manager:
         self.port = Helper.get_available_port()
         self.signer = Signer()
             # Public parameters
-        self.round_number = 0
+        self.round_number = 1
             # Controller
         self.flag = Manager.FLAG.NONE
         self.abort_message = ""
