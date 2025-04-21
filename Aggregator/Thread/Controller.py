@@ -1,9 +1,12 @@
 from Thread.Worker.Manager import Manager
 from Thread.Worker.Helper import Helper
 from Thread.Worker.Thread_Controller import *
-from time import sleep
+from time import sleep, time
+import os, sys
 
 def controller_thread(manager: Manager):
+
+    total_time_aggregation = 0
 
     print("Controller is on and at duty!")
 
@@ -16,7 +19,12 @@ def controller_thread(manager: Manager):
 
         if flag == manager.FLAG.STOP:
 
+            summary_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Summary.txt")
+            with open(summary_path, "a") as f:
+                f.write(f"Total aggregation time: {total_time_aggregation} seconds\n")
+
             print("Got the STOP signal from Trusted party, please command 'stop' to quit!")
+            sys.exit()  # Changed from quit() to sys.exit()
 
         elif flag == manager.FLAG.ABORT:
 
@@ -28,9 +36,11 @@ def controller_thread(manager: Manager):
             manager.start_timer(int(Helper.get_env_variable("TIMEOUT_SECONDS")))
 
         elif flag == manager.FLAG.AGGREGATE:
-
             asyncio.run(send_STATUS(manager))
+            start_aggregate = time()
             manager.aggregate()
+            end_aggregate = time()
+            total_time_aggregation += end_aggregate - start_aggregate
             asyncio.run(send_AGG_MODEL(manager))
 
         elif flag == manager.FLAG.RE_REGISTER:

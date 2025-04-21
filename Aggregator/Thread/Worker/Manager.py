@@ -4,6 +4,7 @@ from Thread.Worker.Helper import Helper
 from Thread.Worker.Unmasker import Unmasker
 from Thread.Worker import Unmask_Module
 from torch.nn.utils import parameters_to_vector, vector_to_parameters
+import torch
 
 class RSA_public_key:
 
@@ -198,12 +199,15 @@ class Manager:
         client.is_online = True
         client.set_trained_data(data_number, signed_data_number, signed_parameters, parameters)
         client.create_receipt(self.signer)
+        self.received_data += 1
+        print(f"Received trained data from client {client.round_ID} ({self.received_data}/{len(self.client_list)} clients)")
 
     def get_receipt(self, client: Client_info) -> Receipt:
         return client.receipt
 
     def end_timer(self):
         self.timeout = True
+        print("Time Out")
         self.timeout_time = time.time()
         self.set_flag(self.FLAG.AGGREGATE)
 
@@ -216,7 +220,7 @@ class Manager:
                 self.timer.cancel()
                 self.end_timer()
                 return
-            time.sleep(10)
+            time.sleep(1)
 
     def start_timer(self, timeout_seconds: int = 60):
         self.timeout = False
@@ -224,20 +228,23 @@ class Manager:
         self.timer.start()
 
         self.checker = threading.Thread(target=self.the_checker)
+        self.checker.daemon = True
         self.checker.start()
             
     @Helper.timing
     def aggregate(self) -> None:
         
         total_parameters = [0 for _ in range(len(self.client_list[0].local_parameters))]
+        # print(total_parameters)
+        # total_parameters = torch.zeros(len(self.client_list[0].local_parameters), dtype=torch.float32)
 
         for client in self.client_list:
             
             if client.is_online:
                 client.ss = Unmasker.get_secret([(point.x, point.y) for point in client.secret_points])
                 client.unmasked_parameters = numpy.zeros((len(client.local_parameters),), dtype=numpy.int64)
-                Unmask_Module.unmask_ss(client.local_parameters, client.unmasked_parameters, Unmasker.get_PRNG_ss(client.ss))
-                
+                Unmask_Module.unmask_ss(client.local_parameters, client.unmasked_parameters, Unmasker.get_PRNG_ss(client.ss)) #numpy.ndarray [numpy.int64]
+
                 for idx in range(len(total_parameters)):
                     total_parameters[idx] += int(client.unmasked_parameters[idx])
 
@@ -254,3 +261,4 @@ class Manager:
         total_data_num = sum([client.local_datanum for client in self.client_list if client.is_online])
         self.global_parameters = numpy.array([param//total_data_num for param in total_parameters], dtype=numpy.int64)
         self.global_model = None
+        print("====================================================\n")

@@ -132,3 +132,13 @@ async def send_ROUND_INFO_aggregator(manager: Manager):
     else:
         print(f"Aggregator returns {data}")
     writer.close()
+
+async def send_PING(client: Client_info):
+    reader, writer = await asyncio.open_connection(client.host, client.port)
+    _ = await reader.read(3)  # Remove first 3 bytes of Telnet command
+
+    # PING
+    data = f'PING'
+    await Helper.send_data(writer, data)
+
+    writer.close()

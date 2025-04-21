@@ -3,6 +3,7 @@ from Thread.Worker.BaseModel import *           # This can be removed
 import random, numpy
 from sympy import randprime, primitive_root
 from copy import deepcopy
+import asyncio
 
 class RSA_public_key:
     
@@ -66,6 +67,9 @@ class Manager():
         class STOP:
             # Used to indicate situation that needs process stopping
             pass
+        class TRAINING_COMPLETE:
+            # Used to indicate training is complete
+            pass
 
     def __init__(self):
         # FL parameters
@@ -74,7 +78,7 @@ class Manager():
         self.aggregator_info = None
             # Public parameters
         # self.commiter = Commiter()
-        self.current_round = 0
+        self.current_round = 1
         # self.last_commitment: numpy.ndarray[numpy.int64] = None
         self.gs_mask = random.randint(1, 2 ** 64)
             # Controller
@@ -82,6 +86,12 @@ class Manager():
         self.stop_message = ""
         # Round parameters
         self.round_manager : Round_Manager = None
+        # Model accuracy tracking
+        self.client_accuracies = {}  # Dict to store client_round_ID -> accuracy
+        self.accuracy_threshold = Helper.get_env_variable("ACCURACY_THRESHOLD") 
+        self.completion_threshold = Helper.get_env_variable("CLIENT_PERCENT_THRESHOLD") 
+        # Track participated clients in each round
+        self.participated_clients = set()  # Set of client IDs that participated in the current round
 
     def stop(self, message: str):
         self.stop_message = message
@@ -134,15 +144,91 @@ class Manager():
     #     return self.commiter
     
     def choose_clients(self, client_num: int) -> list[Client_info]:
+        # Implementation remains for backwards compatibility
         if client_num > len(self.client_list):
             client_num = len(self.client_list)
+        
+        # Before selecting clients, update their selection points based on previous participation
+        if self.current_round > 0:  # Only update points after the first round
+            self.update_client_selection_points()
+            
         return_list = list()
         client_list = deepcopy(self.client_list)
+        
+        # Print client selection probabilities for this round
+        print(f"\n----- Round {self.current_round} Client Selection Probabilities -----")
+        for client in client_list:
+            print(f"Client ID: {client.ID} - Probability points: {client.choose_possibility}")
+        print("--------------------------------------------------------\n")
+        
+        # Thêm Ping Client vào đây
+        from Thread.Worker.Thread_Controller import send_PING
+        for client in client_list:
+            try:
+                asyncio.run(send_PING(client))
+            except ConnectionRefusedError:
+                client_list.remove(client)
+
+
         for i in range(client_num):
             chosen_one = random.choices(client_list, weights=[max(client.choose_possibility, 0) for client in client_list])[0]
             client_list.remove(chosen_one)
             return_list.append(chosen_one)
+            
+        # Store the IDs of selected clients for this round
+        self.participated_clients = {client.ID for client in return_list}
+        
         return return_list
+    
+    def update_client_selection_points(self):
+        """Update client selection points based on participation in the previous round"""
+        for client in self.client_list:
+            if client.ID in self.participated_clients:
+                # Client participated in the previous round: -25 points
+                client.choose_possibility -= 25
+                print(f"Client {client.ID} participated in previous round: -25 points (now {client.choose_possibility})")
+            else:
+                # Client did not participate in the previous round: +25 points
+                client.choose_possibility += 25
+                print(f"Client {client.ID} did not participate in previous round: +25 points (now {client.choose_possibility})")
+
+    def record_client_accuracy(self, client_round_id: int, accuracy: float) -> None:
+        """Record a client's accuracy for the current round"""
+        self.client_accuracies[client_round_id] = accuracy
+        print(f"Received accuracy from client {client_round_id}: {accuracy:.2f}%")
+        
+        # Check if all clients have reported their accuracy
+        if len(self.client_accuracies) == len(self.round_manager.client_list):
+            self.evaluate_model_performance()
+    
+
+    def evaluate_model_performance(self) -> None:
+        """Evaluate if training should complete or continue to next round"""
+        if not self.client_accuracies:
+            print("No accuracy data available for evaluation")
+            return
+            
+        # Count clients meeting the accuracy threshold
+        clients_meeting_threshold = sum(1 for acc in self.client_accuracies.values() if acc >= self.accuracy_threshold)
+        total_clients = len(self.client_accuracies)
+        percentage_meeting_threshold = clients_meeting_threshold / total_clients
+        
+        print(f"\n----- Model Performance Evaluation -----")
+        print(f"Round {self.current_round} - Clients meeting {self.accuracy_threshold}% threshold: "
+              f"{clients_meeting_threshold}/{total_clients} ({percentage_meeting_threshold*100:.1f}%)")
+        
+        if percentage_meeting_threshold >= self.completion_threshold:
+            print(f"Training complete! {percentage_meeting_threshold*100:.1f}% clients "
+                  f"have accuracy >= {self.accuracy_threshold}%")
+            # Set flag to complete training
+            self.set_flag(self.FLAG.TRAINING_COMPLETE)
+        else:
+            print(f"Training will continue to next round. Only {percentage_meeting_threshold*100:.1f}% "
+                  f"clients met the accuracy threshold (target: {self.completion_threshold*100:.1f}%)")
+            # Reset accuracy tracking for next round
+            self.client_accuracies = {}
+            # Set flag to start a new round
+            self.set_flag(self.FLAG.START_ROUND)
     
 class Round_Manager():
 

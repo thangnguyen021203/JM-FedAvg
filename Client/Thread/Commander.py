@@ -11,7 +11,7 @@ def commander_thread(manager: Manager):
 
         if command == 'stop':
             print("Client stops!")
-            quit()
+            sys.exit()  # Changed from quit() to sys.exit()
 
         elif command == "client info":
             print(f"Self info: {manager.host}:{manager.port}")
@@ -41,7 +41,7 @@ def commander_thread(manager: Manager):
             manager.set_flag(manager.FLAG.RE_REGISTER)
 
         elif command == 'cls':
-            os.system('cls')
+            os.system('clear' if os.name != 'nt' else 'cls')
         
         elif command == 'restart':
             os.execv(sys.executable, ['python'] + sys.argv)

@@ -19,6 +19,8 @@ def listener_thread(manager: Manager):
             else:
                 print("STOP due to " + message.decode())
                 manager.set_flag(manager.FLAG.STOP)
+                writer.close()
+                return
 
         # Trusted Party sends round information to Aggregator
         elif b'ROUND_INFO' == data[:10]:
@@ -58,6 +60,7 @@ def listener_thread(manager: Manager):
             data: bytes = await Helper.receive_data(reader)
             local_model_parameters = numpy.frombuffer(data, dtype=numpy.int64)
             # print(f"Get local model parameters from client {round_ID}")
+            print(f"Received {len(local_model_parameters)} parameters from client {client_round_ID}")
             
             if not manager.timeout:
 
@@ -71,13 +74,12 @@ def listener_thread(manager: Manager):
                 else:
                     manager.receive_trained_data(client, data_number, data_num_signature, parameters_signature, local_model_parameters)
                     receipt: Receipt = manager.get_receipt(client)
-                    manager.received_data += 1
 
                     # SUCCESS <received_time> <signed_received_data>
                     data = f"SUCCESS {receipt.received_time} {receipt.signed_received_data}"
                     await Helper.send_data(writer, data)
-                    print(f"Successfully receive local model parameters of client {client_round_ID}")
-
+                    print(f"Received {len(local_model_parameters)} parameters from client {client_round_ID}")
+                    
             else:
 
                 # OUT_OF_TIME <end_time>

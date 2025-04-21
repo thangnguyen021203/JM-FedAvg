@@ -1,6 +1,7 @@
 import asyncio, telnetlib3, struct, numpy
 from Thread.Worker.Manager import Manager, Client_info
 from Thread.Worker.Helper import Helper
+from Thread.Worker.Thread_Controller import send_MODEL_ACCURACY
 
 def listener_thread(manager: Manager):
     
@@ -9,6 +10,11 @@ def listener_thread(manager: Manager):
     async def shell(reader: telnetlib3.TelnetReader, writer: telnetlib3.TelnetWriter):
 
         data = await Helper.receive_data(reader)
+
+        if b'PING' == data[:4]:
+            print("Trusted Party PING!")
+            writer.close()
+            return
 
         # Aggregator/Client aborts the process due to abnormal activities
         if b'STOP' == data[:4]:
@@ -19,6 +25,8 @@ def listener_thread(manager: Manager):
             else:
                 print("STOP due to " + message.decode())
                 manager.set_flag(manager.FLAG.STOP)
+            writer.close()
+            return
 
         # Trusted Party gets DH public keys from chosen Clients
         elif b'DH_PARAM' == data[:8]:
@@ -74,7 +82,7 @@ def listener_thread(manager: Manager):
             data = await Helper.receive_data(reader)
             
             # print(f"Get global parameters for the round {manager.round_number}")
-            if manager.round_number == 0:
+            if manager.round_number == 1:
                 global_parameters = numpy.frombuffer(data, dtype=numpy.float32)
                 manager.trainer.load_parameters(global_parameters, manager.round_ID)
             else:
@@ -147,10 +155,12 @@ def listener_thread(manager: Manager):
 
             # Load the parameters directly without verification since ZKP is removed
             manager.trainer.load_parameters(manager.get_unmasked_model(received_global_parameters), manager.round_ID)
+
             await Helper.send_data(writer, "SUCCESS")
             print(f"Successfully receive global models from the Aggregator")
             writer.close()
-
+            
+            asyncio.ensure_future(send_MODEL_ACCURACY(manager))
         else:
             await Helper.send_data(writer, "Operation not allowed!")
         
