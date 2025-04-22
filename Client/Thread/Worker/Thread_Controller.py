@@ -5,6 +5,7 @@ from Thread.Worker.Manager import Manager, Client_info, RSA_public_key
 TRUSTED_PARTY_HOST = Helper.get_env_variable("TRUSTED_PARTY_HOST")
 TRUSTED_PARTY_PORT = Helper.get_env_variable("TRUSTED_PARTY_PORT")
 
+
 # Client registers itself with Trusted Party
 async def send_CLIENT(manager: Manager):
 
@@ -99,7 +100,9 @@ async def send_LOCAL_MODEL(manager: Manager):
     # print("Send local model information")
 
     # <local_model_parameters>
+    start_time = time.time()
     data = manager.get_masked_model().tobytes()
+    manager.total_masking_time += time.time()-start_time
     await Helper.send_data(writer, data)
 
     # print("Send local model parameters")
@@ -145,3 +148,10 @@ async def send_MODEL_ACCURACY(manager: Manager):
     else:
         print(f"Trusted party returns {data}")
     writer.close()
+
+    if manager.round_ID == 0:
+        manager.accuracy_to_summary()
+    
+    # Clear memory after sending model accuracy to free up RAM
+    print(f"Round {manager.round_ID} completed, clearing memory...")
+    manager.clear_memory()

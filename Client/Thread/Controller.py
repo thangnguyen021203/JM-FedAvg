@@ -6,6 +6,7 @@ import os, sys
 def controller_thread(manager: Manager):
 
     total_training_time = 0
+    total_sharingPoint_time = 0
 
     print("Controller is on and at duty!")
 
@@ -22,7 +23,10 @@ def controller_thread(manager: Manager):
             summary_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Summary.txt")
             with open(summary_path, "a") as f:
                 f.write(f"Total training time for client: {total_training_time} seconds\n")
-            
+                f.write(f"Total sharing point time for client: {total_sharingPoint_time} seconds\n")
+                f.write(f"Total masking time for client: {manager.total_masking_time} seconds\n")
+                # f.write(f"Total unmasking time for client: {manager.total_unmasking_time} seconds\n")
+
             print("Got the STOP signal from Trusted party, please command 'stop' to quit!")
             sys.exit()
 
@@ -37,11 +41,15 @@ def controller_thread(manager: Manager):
         elif flag == manager.FLAG.TRAIN:
     
             print(f"[Client {manager.round_ID}] Starting round {manager.round_number} with gs_mask: {manager.gs_mask}")
+
+            start_sharePoint_time = time()
             asyncio.run(send_POINTS(manager))
+            total_sharingPoint_time += time()-start_sharePoint_time
+
             start_train = time()
             manager.start_train()
-            end_train = time()
-            total_training_time += end_train - start_train
+            total_training_time += time() - start_train
+
             asyncio.run(send_LOCAL_MODEL(manager))
 
         sleep(5)

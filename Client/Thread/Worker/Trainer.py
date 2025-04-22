@@ -6,6 +6,7 @@ from Thread.Worker.BaseModel import *
 import torchvision, torch.optim as optim
 from tqdm import tqdm
 from Thread.Worker.Helper import Helper
+import gc
 
 class Trainer:
 
@@ -15,6 +16,7 @@ class Trainer:
 
         # Instantiate and move model to device
         self.local_model : CNNModel_MNIST = model_type().to(self.device)
+        self.model_type = model_type
 
         self.dataset_type = model_type.__name__.split('_')[-1]
         self.batch_size = int(Helper.get_env_variable('BATCH_SIZE'))
@@ -163,3 +165,59 @@ class Trainer:
     #     test_loader = DataLoader(self.__get_test_data__())
     #     self.local_model.eval()
     #     self.test(test_loader, epoch_idx=0)
+
+    @torch.no_grad()
+    def test_aggregated_model(self):
+        self.local_model.eval()
+
+        images = torch.stack([self.root_test_data[i][0] for i in range(len(self.root_test_data))])
+        labels = torch.tensor([self.root_test_data[i][1] for i in range(len(self.root_test_data))])
+        test_loader = DataLoader(TensorDataset(images,labels))
+
+        test_loss = 0
+        correct = 0
+
+        for data, target in tqdm(test_loader, unit=" data", leave=False):
+            data, target = data.to(self.device), target.to(self.device)
+            output = self.local_model(data)
+            test_loss += F.nll_loss(output, target, reduction="sum").item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+        test_loss /= len(test_loader.dataset)
+        accuracy = 100.0 * correct / len(test_loader.dataset)
+        return float(accuracy)
+    
+    def clear_parameters(self):
+        """Clear model parameters and cached data to free up memory"""
+        print("Clearing model parameters and freeing memory...")
+        
+        # Re-initialize the model with default parameters to clear learned weights
+        # self.local_model = self.model_type().to(self.device)
+        # self.optimizer = optim.SGD(self.local_model.parameters(), lr=self.learning_rate, momentum=0.5)
+        
+        if hasattr(self, 'root_train_data'):
+            del self.root_train_data
+
+        if hasattr(self, 'root_test_data'):
+            del self.root_test_data
+
+        if hasattr(self, 'local_model'):
+            del self.local_model
+        
+        if hasattr(self, 'optimizer'):
+            del self.optimizer
+
+        # Clear dataset references
+        if hasattr(self, 'self_train_data'):
+            del self.self_train_data
+        if hasattr(self, 'self_test_data'):
+            del self.self_test_data
+            
+        # Force garbage collection
+        gc.collect()
+        
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            
+        print("Memory cleared successfully")

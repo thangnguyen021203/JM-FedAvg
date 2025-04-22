@@ -2,6 +2,9 @@ import asyncio, telnetlib3, struct, numpy
 from Thread.Worker.Manager import Manager, Client_info
 from Thread.Worker.Helper import Helper
 from Thread.Worker.Thread_Controller import send_MODEL_ACCURACY
+from Thread.Worker.Trainer import Trainer
+import torch.optim as optim
+
 
 def listener_thread(manager: Manager):
     
@@ -87,9 +90,19 @@ def listener_thread(manager: Manager):
             # print(f"Get global parameters for the round {manager.round_number}")
             if manager.round_number == 1:
                 global_parameters = numpy.frombuffer(data, dtype=numpy.float32)
+
+                manager.trainer.local_model = manager.trainer.model_type().to(manager.trainer.device)
+                manager.trainer.optimizer = optim.SGD(manager.trainer.local_model.parameters(), 
+                                                 lr=manager.trainer.learning_rate, momentum=0.5)
+                
                 manager.trainer.load_parameters(global_parameters, manager.round_ID)
             else:
                 global_parameters = numpy.frombuffer(data, dtype=numpy.int64)
+
+                manager.trainer.local_model = manager.trainer.model_type().to(manager.trainer.device)
+                manager.trainer.optimizer = optim.SGD(manager.trainer.local_model.parameters(), 
+                                                 lr=manager.trainer.learning_rate, momentum=0.5)
+
                 manager.trainer.load_parameters(manager.get_unmasked_model(global_parameters), manager.round_ID)
 
             # SUCCESS

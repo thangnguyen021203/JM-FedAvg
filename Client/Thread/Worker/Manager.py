@@ -3,6 +3,8 @@ from Thread.Worker.Masker import Masker
 from Thread.Worker.Trainer import Trainer
 from Thread.Worker.BaseModel import *
 import random, numpy, struct
+from time import time
+import gc
 
 class Client_info:
 
@@ -125,6 +127,10 @@ class Manager:
         self.masker = None
         self.receipt = None
 
+        self.total_mask = 0
+        self.total_unmasking_time = 0
+        self.total_masking_time = 0
+
     def get_flag(self) -> type:
         if self.flag == Manager.FLAG.NONE:
             return Manager.FLAG.NONE
@@ -181,8 +187,11 @@ class Manager:
         self.get_neighbor_by_ID(neighbor_ID).set_secret_points(ss_point, ps_point)
             
     def get_unmasked_model(self, masked_parameters: numpy.ndarray[numpy.int64]) -> numpy.ndarray[numpy.float32]:
-        return self.masker.unmask_params(masked_parameters, self.gs_mask)
-
+        start_time = time()
+        unmask_params = self.masker.unmask_params(masked_parameters, self.gs_mask)
+        self.total_unmasking_time += time()-start_time        
+        return unmask_params
+    
     def get_signed_data_num(self) -> int:
         return self.signer.sign(self.trainer.data_num)
     
@@ -200,3 +209,29 @@ class Manager:
             if neighbor.round_ID == neighbor_ID:
                 return neighbor
         return None
+    
+    def accuracy_to_summary(self):
+        accuracy = self.trainer.test_aggregated_model()
+
+        import os
+        # Instead of saving to TCMODEL, write to Summary.txt
+        summary_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "..", "Summary.txt"))
+        
+        model_info = f"Round {self.round_number}:"\
+                    f"Accuracy: {accuracy:.2f}%\n"
+        
+        # Append the information to Summary.txt
+        with open(summary_path, 'a') as f:
+            f.write(model_info)
+            
+        print(f"Model information saved to Summary.txt: {model_info}")
+    
+    def clear_memory(self):
+        """Clear all memory related to the current round"""
+        if self.trainer:
+            self.trainer.clear_parameters()
+        
+        # Force garbage collection
+        gc.collect()
+        
+        print("Memory cleared for Manager")

@@ -3,6 +3,7 @@ from Thread.Worker.Helper import Helper
 from Thread.Worker.Thread_Controller import *
 from time import sleep, time
 import os, sys
+from Thread.Worker.Unmasker import Unmasker
 
 def controller_thread(manager: Manager):
 
@@ -22,6 +23,7 @@ def controller_thread(manager: Manager):
             summary_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Summary.txt")
             with open(summary_path, "a") as f:
                 f.write(f"Total aggregation time: {total_time_aggregation} seconds\n")
+                f.write(f"Total calculation secrets time: {Unmasker.total_calSecret_time} seconds\n")
 
             print("Got the STOP signal from Trusted party, please command 'stop' to quit!")
             sys.exit()  # Changed from quit() to sys.exit()

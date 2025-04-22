@@ -1,9 +1,13 @@
 from Thread.Worker.Helper import Helper
+from time import time
+
 
 class Unmasker:
-
+    total_calSecret_time = 0
     @staticmethod
     def get_secret(point_list: list[tuple[int, int]]) -> int:
+        calSecret = time()
+
         secret = Helper.get_secret(point_list)
         secret_check = Helper.get_secret(point_list[1:])
         if not secret == secret_check:
@@ -12,6 +16,9 @@ class Unmasker:
             print(f"Secret: {secret}")
             print(f"Secret test: {secret_check}")
             return 0
+        
+        Unmasker.total_calSecret_time += time() - calSecret
+        
         return secret
 
     @staticmethod
