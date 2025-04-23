@@ -7,6 +7,7 @@ import torchvision, torch.optim as optim
 from tqdm import tqdm
 from Thread.Worker.Helper import Helper
 import gc
+import random
 
 class Trainer:
 
@@ -35,6 +36,17 @@ class Trainer:
         transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
         self.root_train_data = self.root_dataset(root="Thread/Worker/Data", train=True, download=True, transform=transform)
         self.root_test_data = self.root_dataset(root="Thread/Worker/Data", train=False, download=True, transform=transform)
+
+        data_seed = int(Helper.get_env_variable('DATA_SEED'))
+        # Shuffle train dataset
+        train_indices = list(range(len(self.root_train_data)))
+        random.Random(data_seed).shuffle(train_indices)  # Seed 42 để giữ tái lập
+        self.root_train_data = Subset(self.root_train_data, train_indices)
+
+        # Shuffle test dataset
+        test_indices = list(range(len(self.root_test_data)))
+        random.Random(data_seed).shuffle(test_indices)
+        self.root_test_data = Subset(self.root_test_data, test_indices)
 
         ATTEND_CLIENTS = int(Helper.get_env_variable('ATTEND_CLIENTS'))
         subset_num = int(Helper.get_env_variable('SUBSET_NUM'))
