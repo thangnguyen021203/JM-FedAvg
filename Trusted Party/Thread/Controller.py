@@ -19,7 +19,7 @@ def controller_thread(manager: Manager):
 
         if flag == manager.FLAG.STOP:
 
-            print("Send the STOP signal...")
+            print("Got the STOP signal from Trusted party, please command 'stop' to quit!")
             sys.exit()
 
         # When training is complete, send STOP signals to all clients and Aggregator
@@ -33,7 +33,7 @@ def controller_thread(manager: Manager):
             # Write results to file before sending STOP
             summary_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Summary.txt")
             with open(summary_path, "a") as f:
-                f.write(f"Training completed successfully in {manager.current_round-1} rounds\n")
+                f.write(f"Training completed successfully in {manager.current_round} rounds\n")
                 f.write(f"Total time to convergence: {total_time_convergence} seconds\n")
                 
             # Send STOP to all clients and aggregator

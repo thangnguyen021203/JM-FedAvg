@@ -18,9 +18,9 @@ async def send_CLIENT(manager: Manager):
     
     # <aggregator_host> <aggregator_port> <aggregator RSA_public_key> <gs_mask>
     data = await Helper.receive_data(reader)
-    host, port, e, n, gs_mask = data.split(b' ', 4)  # Fixed: Only expecting 5 items now
+    host, port, subset_ID, e, n, gs_mask = data.split(b' ', 5)  # Fixed: Only expecting 5 items now
     host = host.decode()
-    port, gs_mask = int(port), int(gs_mask)
+    manager.subset_ID, port, gs_mask = int(subset_ID), int(port), int(gs_mask)
     public_key = RSA_public_key(int(e), int(n))
     # commiter = Commiter(tuple([int(param) for param in [p, h, k]]))
 

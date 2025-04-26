@@ -15,7 +15,9 @@ def listener_thread(manager: Manager):
         data = await Helper.receive_data(reader)
 
         if b'PING' == data[:4]:
-            print("Trusted Party PING!")
+            if manager.trainer:
+                manager.trainer.clear_parameters()
+                print("Model parameters cleared after PING")
             writer.close()
             return
 

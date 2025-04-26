@@ -1,39 +1,25 @@
-Round 1:Accuracy: 26.84%
-Round 2:Accuracy: 47.16%
-Round 3:Accuracy: 77.90%
-Round 4:Accuracy: 84.17%
-Round 5:Accuracy: 87.92%
-Round 6:Accuracy: 89.30%
-Round 7:Accuracy: 90.43%
-Round 8:Accuracy: 92.37%
-Round 9:Accuracy: 92.68%
-Round 10:Accuracy: 93.44%
-Round 11:Accuracy: 93.95%
-Training completed successfully in 10 rounds
-Total time to convergence: 630.152325630188 seconds
-Total training time for client: 5.727205753326416 seconds
-Total sharing point time for client: 32.248695850372314 seconds
-Total masking time for client: 0.013883352279663086 seconds
-Total unmasking time for client: 0.026435136795043945 seconds
-Total training time for client: 5.304242849349976 seconds
-Total sharing point time for client: 28.164166688919067 seconds
-Total masking time for client: 0.01338648796081543 seconds
-Total unmasking time for client: 0.024680376052856445 seconds
-Total training time for client: 5.3604536056518555 seconds
-Total sharing point time for client: 32.31938099861145 seconds
-Total masking time for client: 0.013776540756225586 seconds
-Total unmasking time for client: 0.028109073638916016 seconds
-Total aggregation time: 0.2477433681488037 seconds
-Total calculation secrets time: 0.0019953250885009766 seconds
-Total training time for client: 5.459948539733887 seconds
-Total sharing point time for client: 28.146153688430786 seconds
-Total masking time for client: 0.011660575866699219 seconds
-Total unmasking time for client: 0.021474838256835938 seconds
-Total training time for client: 4.307932376861572 seconds
-Total sharing point time for client: 24.126062154769897 seconds
-Total masking time for client: 0.013642549514770508 seconds
-Total unmasking time for client: 0.022928476333618164 seconds
-Total training time for client: 5.475339889526367 seconds
-Total sharing point time for client: 32.12333679199219 seconds
-Total masking time for client: 0.013692140579223633 seconds
-Total unmasking time for client: 0.02824711799621582 seconds
+Round 1 Client 114403742738607 Accuracy 23.00%
+Round 1 Client 114403742771299 Accuracy 12.00%
+Round 1 Client 114403742737551 Accuracy 14.00%
+Round 1 Client 114403742790811 Accuracy 14.00%
+Round 1:Accuracy: 17.88%
+Round 2 Client 114403742858256 Accuracy 43.00%
+Round 2 Client 114403742836777 Accuracy 37.00%
+Round 2 Client 114403742737551 Accuracy 28.00%
+Round 2 Client 114403742738607 Accuracy 39.00%
+Round 2:Accuracy: 36.67%
+Round 3 Client 114403742771299 Accuracy 75.00%
+Round 3 Client 114403742836777 Accuracy 69.00%
+Round 3 Client 114403742790811 Accuracy 73.00%
+Round 3 Client 114403742738607 Accuracy 77.00%
+Round 3:Accuracy: 74.41%
+Round 4 Client 114403742836777 Accuracy 75.00%
+Round 4 Client 114403742858256 Accuracy 90.00%
+Round 4 Client 114403742737551 Accuracy 82.00%
+Round 4 Client 114403742771299 Accuracy 84.00%
+Round 4:Accuracy: 82.81%
+Round 5 Client 114403742737551 Accuracy 87.00%
+Round 5 Client 114403742790811 Accuracy 92.00%
+Round 5 Client 114403742858256 Accuracy 92.00%
+Round 5 Client 114403742836777 Accuracy 81.00%
+Round 5:Accuracy: 87.09%

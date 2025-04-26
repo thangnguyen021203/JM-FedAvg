@@ -191,13 +191,37 @@ class Manager():
                 # Client did not participate in the previous round: +25 points
                 client.choose_possibility += 25
                 print(f"Client {client.ID} did not participate in previous round: +25 points (now {client.choose_possibility})")
+        # Sau khi đã cập nhật xong:
+        if any(client.choose_possibility <= 0 for client in self.client_list):
+            for client in self.client_list:
+                client.choose_possibility += 25
+                print("Có client có possibility <= 0, đã cộng thêm 25 cho tất cả clients.")
 
     def record_client_accuracy(self, client_round_id: int, accuracy: float) -> None:
         """Record a client's accuracy for the current round"""
         self.client_accuracies[client_round_id] = accuracy
         print(f"Received accuracy from client {client_round_id}: {accuracy:.2f}%")
         
-        # Check if all clients have reported their accuracy
+        # Get the actual client ID from round ID - look in round_manager.client_list instead
+        client = None
+        if self.round_manager:
+            client = self.round_manager.__get_client_by_round_ID__(client_round_id)
+                # If not found in round_manager, try the main client list as fallback
+        if not client:
+            client = self.__get_client_by_round_ID__(client_round_id)
+           
+        client_id = client.ID if client else f"RoundID-{client_round_id}"
+                # Write to Summary.txt
+        import os
+        summary_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "..", "Summary.txt"))
+                # Format: "Round X Client Y Accuracy Z%"
+        summary_entry = f"Round {self.current_round } Client {client_id} Accuracy {accuracy:.2f}%\n"
+                # Append the information to Summary.txt
+        with open(summary_path, 'a') as f:
+            f.write(summary_entry)
+           
+        print(f"Client accuracy information saved to Summary.txt: {summary_entry.strip()}")
+                # Check if all clients have reported their accuracy
         if len(self.client_accuracies) == len(self.round_manager.client_list):
             self.evaluate_model_performance()
     

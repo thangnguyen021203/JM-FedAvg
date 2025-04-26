@@ -53,10 +53,11 @@ def listener_thread(manager: Manager):
             port, e, n = int(port), int(e), int(n)
             id = int(time.time()*65535)
             manager.add_client(id, host, port, RSA_public_key(e, n))
+            subset_ID = len(manager.client_list) - 1
             # print(f"Confirm to get registration from Client {id} - {host}:{port}")
 
             # <aggregator_host> <aggregator_port> <aggregator RSA_public_key> <gs_mask>
-            data = f"{manager.aggregator_info.host} {manager.aggregator_info.port} {manager.aggregator_info.RSA_public_key.e} {manager.aggregator_info.RSA_public_key.n} {manager.gs_mask}"
+            data = f"{manager.aggregator_info.host} {manager.aggregator_info.port} {subset_ID} {manager.aggregator_info.RSA_public_key.e} {manager.aggregator_info.RSA_public_key.n} {manager.gs_mask}"
             await Helper.send_data(writer, data)
             
             # <base_model_class>

@@ -127,6 +127,9 @@ class Manager:
         self.masker = None
         self.receipt = None
 
+        # Trainer
+        self.subset_ID = None
+
         self.total_mask = 0
         self.total_unmasking_time = 0
         self.total_masking_time = 0
@@ -165,7 +168,7 @@ class Manager:
         self.set_flag(self.FLAG.ABORT)
     
     def start_train(self):
-        self.trainer.set_dataset_ID(self.round_ID, self.round_number)
+        self.trainer.set_dataset_ID(self.subset_ID)
         self.trainer.train()
 
     def test_aggregated_model(self) -> float:

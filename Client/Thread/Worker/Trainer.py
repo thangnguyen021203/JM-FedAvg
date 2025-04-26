@@ -29,7 +29,7 @@ class Trainer:
         # self.optimizer = self.local_model.optimizer
         # self.lossf = self.local_model.loss
 
-    def set_dataset_ID(self, ID: int, round_number: int):
+    def set_dataset_ID(self, ID: int):
         self.ID = ID
         self.root_dataset: type = getattr(torchvision.datasets, self.dataset_type)
 
@@ -47,13 +47,15 @@ class Trainer:
         test_indices = list(range(len(self.root_test_data)))
         random.Random(data_seed).shuffle(test_indices)
         self.root_test_data = Subset(self.root_test_data, test_indices)
-
-        ATTEND_CLIENTS = int(Helper.get_env_variable('ATTEND_CLIENTS'))
+        
+        # ATTEND_CLIENTS = int(Helper.get_env_variable('ATTEND_CLIENTS'))
         subset_num = int(Helper.get_env_variable('SUBSET_NUM'))
 
         self.data_num = len(self.root_train_data) // subset_num
-        start = ((round_number * ATTEND_CLIENTS + self.ID) * self.data_num) % len(self.root_train_data)
-        end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.data_num) % len(self.root_train_data)
+        start = self.ID * self.data_num
+        end = (self.ID + 1) * self.data_num
+        # start = ((round_number * ATTEND_CLIENTS + self.ID) * self.data_num) % len(self.root_train_data)
+        # end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.data_num) % len(self.root_train_data)
 
         if start < end:
             indices = range(start, end)
@@ -62,8 +64,10 @@ class Trainer:
         self.self_train_data = Subset(self.root_train_data, indices)
 
         self.test_data_num = len(self.root_test_data) // subset_num
-        test_start = ((round_number * ATTEND_CLIENTS + self.ID) * self.test_data_num) % len(self.root_test_data)
-        test_end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.test_data_num) % len(self.root_test_data)
+        test_start = self.ID * self.test_data_num
+        test_end = (self.ID + 1) * self.test_data_num
+        # test_start = ((round_number * ATTEND_CLIENTS + self.ID) * self.test_data_num) % len(self.root_test_data)
+        # test_end = ((round_number * ATTEND_CLIENTS + self.ID + 1) * self.test_data_num) % len(self.root_test_data)
 
         if test_start < test_end:
             test_indices = range(test_start, test_end)
