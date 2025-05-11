@@ -84,9 +84,9 @@ class Trainer:
         
         self.local_model.cpu()
         tensor = torch.tensor(parameters, dtype=torch.float32, requires_grad=True)
-        torch.save(self.local_model, f"{models_dir}/{round_ID}_old.pth")
+        # torch.save(self.local_model, f"{models_dir}/{round_ID}_old.pth")
         vector_to_parameters(tensor, self.local_model.parameters())
-        torch.save(self.local_model, f"{models_dir}/{round_ID}_new.pth")
+        # torch.save(self.local_model, f"{models_dir}/{round_ID}_new.pth")
         self.local_model.to(self.device)
 
     def get_parameters(self) -> numpy.ndarray[numpy.float32]:

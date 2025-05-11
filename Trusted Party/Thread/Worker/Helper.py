@@ -22,7 +22,7 @@ class Helper:
         # Please enhance the code to ensure there is no pair of nodes having more than or equal to 'limitation' same neighbors
         # limitation = neighbor_num//2
 
-        if node_num % 2 and neighbor_num % 2:
+        if node_num % 2 == 1 and neighbor_num % 2 == 1:
             raise Exception(f"There is no graph available for {node_num} nodes and each node having {neighbor_num} neighbors!")
 
         neighbor_list : dict[int: list] = {}

@@ -5,6 +5,9 @@ from Thread.Worker.Unmasker import Unmasker
 from Thread.Worker import Unmask_Module
 from torch.nn.utils import parameters_to_vector, vector_to_parameters
 import torch
+from torch.utils.data import DataLoader, TensorDataset
+import torchvision, torch.optim as optim
+from tqdm import tqdm
 
 class RSA_public_key:
 
@@ -171,10 +174,13 @@ class Manager:
     #     self.commiter = commiter
 
     def get_global_parameters(self) -> numpy.ndarray[numpy.float32 | numpy.int64]:
-        if not self.global_model is None:
+        if self.round_number == 1:
             return parameters_to_vector(self.global_model.parameters()).detach().numpy()
-        else:
-            return self.global_parameters
+        return self.global_parameters
+        # if not self.global_model is None:
+            # return parameters_to_vector(self.global_model.parameters()).detach().numpy()
+        # else:
+            # return self.global_parameters
 
     # def get_global_commit(self) -> numpy.ndarray[numpy.uint64]:
     #     if not self.global_model is None:
@@ -260,5 +266,47 @@ class Manager:
 
         total_data_num = sum([client.local_datanum for client in self.client_list if client.is_online])
         self.global_parameters = numpy.array([param//total_data_num for param in total_parameters], dtype=numpy.int64)
-        self.global_model = None
+        # self.global_model = None
         print("====================================================\n")
+
+    def test_aggregated_model(self):
+        tensor = torch.tensor(self.global_parameters, dtype=torch.float32, requires_grad=True)
+        vector_to_parameters(tensor, self.global_model.parameters())
+        
+        models_dir = "Thread/Worker/Data/Models"
+        torch.save(self.global_model, f"{models_dir}/{self.round_number}.pth")
+
+        self.global_model.eval()
+        transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+        self.root_dataset: type = getattr(torchvision.datasets, "MNIST")
+        self.root_test_data = self.root_dataset(root="Thread/Worker/Data", train=False, download=True, transform=transform)
+        images = torch.stack([self.root_test_data[i][0] for i in range(len(self.root_test_data))])
+        labels = torch.tensor([self.root_test_data[i][1] for i in range(len(self.root_test_data))])
+        test_loader = DataLoader(TensorDataset(images,labels))
+
+        test_loss = 0
+        correct = 0
+
+        self.device = Helper.get_device()
+        for data, target in tqdm(test_loader, unit=" data", leave=False):
+            data, target = data.to(self.device), target.to(self.device)
+            output = self.global_model(data)
+            test_loss += F.nll_loss(output, target, reduction="sum").item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+        test_loss /= len(test_loader.dataset)
+        accuracy = float(100.0 * correct / len(test_loader.dataset))
+        
+        import os
+        # Instead of saving to TCMODEL, write to Summary.txt
+        summary_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", "..", "Summary.txt"))
+        
+        model_info = f"Aggregator Test in Round {self.round_number}:"\
+                    f"Accuracy: {accuracy:.2f}%\n"
+        
+        # Append the information to Summary.txt
+        with open(summary_path, 'a') as f:
+            f.write(model_info)
+            
+        print(f"Aggregator Test in {self.round_number}: {accuracy:.2f}%")

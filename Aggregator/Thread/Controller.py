@@ -43,6 +43,7 @@ def controller_thread(manager: Manager):
             manager.aggregate()
             end_aggregate = time()
             total_time_aggregation += end_aggregate - start_aggregate
+            manager.test_aggregated_model()
             asyncio.run(send_AGG_MODEL(manager))
 
         elif flag == manager.FLAG.RE_REGISTER:

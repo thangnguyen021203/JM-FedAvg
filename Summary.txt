@@ -1,25 +1,82 @@
-Round 1 Client 114403742738607 Accuracy 23.00%
-Round 1 Client 114403742771299 Accuracy 12.00%
-Round 1 Client 114403742737551 Accuracy 14.00%
-Round 1 Client 114403742790811 Accuracy 14.00%
-Round 1:Accuracy: 17.88%
-Round 2 Client 114403742858256 Accuracy 43.00%
-Round 2 Client 114403742836777 Accuracy 37.00%
-Round 2 Client 114403742737551 Accuracy 28.00%
-Round 2 Client 114403742738607 Accuracy 39.00%
-Round 2:Accuracy: 36.67%
-Round 3 Client 114403742771299 Accuracy 75.00%
-Round 3 Client 114403742836777 Accuracy 69.00%
-Round 3 Client 114403742790811 Accuracy 73.00%
-Round 3 Client 114403742738607 Accuracy 77.00%
-Round 3:Accuracy: 74.41%
-Round 4 Client 114403742836777 Accuracy 75.00%
-Round 4 Client 114403742858256 Accuracy 90.00%
-Round 4 Client 114403742737551 Accuracy 82.00%
-Round 4 Client 114403742771299 Accuracy 84.00%
-Round 4:Accuracy: 82.81%
-Round 5 Client 114403742737551 Accuracy 87.00%
-Round 5 Client 114403742790811 Accuracy 92.00%
-Round 5 Client 114403742858256 Accuracy 92.00%
-Round 5 Client 114403742836777 Accuracy 81.00%
-Round 5:Accuracy: 87.09%
+Aggregator Test in Round 1:Accuracy: 9.80%
+Round 1 Client 114486586974594 Accuracy 34.40%
+Round 1 Client 114486587844275 Accuracy 40.00%
+Round 1 Client 114486587460531 Accuracy 36.00%
+Round 1 Client 114486586775263 Accuracy 32.80%
+Round 1:Accuracy: 35.91%
+Aggregator Test in Round 2:Accuracy: 9.80%
+Round 2 Client 114486587844275 Accuracy 54.40%
+Round 2 Client 114486586490546 Accuracy 62.40%
+Round 2 Client 114486587152064 Accuracy 64.80%
+Round 2 Client 114486587612480 Accuracy 58.40%
+Round 2:Accuracy: 58.75%
+Aggregator Test in Round 1:Accuracy: 9.80%
+Round 1 Client 114486703731403 Accuracy 14.40%
+Round 1 Client 114486703524885 Accuracy 12.80%
+Round 1 Client 114486703678584 Accuracy 8.00%
+Round 1 Client 114486703622094 Accuracy 9.60%
+Round 1:Accuracy: 10.04%
+Aggregator Test in Round 2:Accuracy: 9.80%
+Round 2 Client 114486703524885 Accuracy 46.40%
+Round 2 Client 114486703167431 Accuracy 48.80%
+Round 2 Client 114486703278235 Accuracy 48.00%
+Round 2 Client 114486703596159 Accuracy 48.80%
+Round 2:Accuracy: 48.14%
+Aggregator Test in Round 3:Accuracy: 9.80%
+Round 3 Client 114486703278235 Accuracy 80.80%
+Round 3 Client 114486703731403 Accuracy 88.00%
+Round 3 Client 114486703596159 Accuracy 82.40%
+Round 3 Client 114486703225768 Accuracy 81.60%
+Round 3:Accuracy: 79.91%
+Aggregator Test in Round 4:Accuracy: 9.80%
+Round 4 Client 114486703278235 Accuracy 88.00%
+Round 4 Client 114486703731403 Accuracy 90.40%
+Round 4 Client 114486703225768 Accuracy 87.20%
+Round 4 Client 114486703412185 Accuracy 89.60%
+Round 4:Accuracy: 85.83%
+Aggregator Test in Round 5:Accuracy: 9.80%
+Round 5 Client 114486703678584 Accuracy 86.40%
+Round 5 Client 114486703167431 Accuracy 88.00%
+Round 5 Client 114486703524885 Accuracy 84.80%
+Round 5 Client 114486703622094 Accuracy 90.40%
+Round 5:Accuracy: 86.77%
+Aggregator Test in Round 6:Accuracy: 9.80%
+Round 6 Client 114486703731403 Accuracy 93.60%
+Round 6 Client 114486703225768 Accuracy 94.40%
+Round 6 Client 114486703412185 Accuracy 95.20%
+Round 6 Client 114486703380630 Accuracy 85.60%
+Round 6:Accuracy: 90.78%
+Aggregator Test in Round 7:Accuracy: 9.80%
+Round 7 Client 114486703678584 Accuracy 91.20%
+Round 7 Client 114486703278235 Accuracy 95.20%
+Round 7 Client 114486703596159 Accuracy 93.60%
+Round 7 Client 114486703225768 Accuracy 95.20%
+Training completed successfully in 7 rounds
+Total time to convergence: 2014.185548067093 seconds
+Total training time for client: 191.31205892562866 seconds
+Total sharing point time for client: 8.156602144241333 seconds
+Total masking time for client: 0.01441645622253418 seconds
+Total training time for client: 446.98579835891724 seconds
+Total sharing point time for client: 16.201937437057495 seconds
+Total masking time for client: 0.012473344802856445 seconds
+Round 7:Accuracy: 91.48%
+Total training time for client: 324.2230432033539 seconds
+Total sharing point time for client: 12.468052864074707 seconds
+Total masking time for client: 0.008262872695922852 seconds
+Total training time for client: 483.2831485271454 seconds
+Total sharing point time for client: 16.23349142074585 seconds
+Total masking time for client: 0.011373281478881836 seconds
+Total training time for client: 328.43510127067566 seconds
+Total sharing point time for client: 12.154678583145142 seconds
+Total masking time for client: 0.008912086486816406 seconds
+Total training time for client: 222.2100350856781 seconds
+Total sharing point time for client: 8.2710440158844 seconds
+Total masking time for client: 0.005972862243652344 seconds
+Total aggregation time: 0.4470088481903076 seconds
+Total calculation secrets time: 0.0023021697998046875 seconds
+Total training time for client: 448.32576608657837 seconds
+Total sharing point time for client: 16.362592935562134 seconds
+Total masking time for client: 0.013474464416503906 seconds
+Total training time for client: 195.00602793693542 seconds
+Total sharing point time for client: 8.178043603897095 seconds
+Total masking time for client: 0.006742000579833984 seconds

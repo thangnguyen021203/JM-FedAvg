@@ -1,6 +1,7 @@
 import asyncio, dill as pickle, time
 from Thread.Worker.Helper import Helper
 from Thread.Worker.Manager import Manager, Client_info, RSA_public_key
+import torch
 
 TRUSTED_PARTY_HOST = Helper.get_env_variable("TRUSTED_PARTY_HOST")
 TRUSTED_PARTY_PORT = Helper.get_env_variable("TRUSTED_PARTY_PORT")
@@ -150,6 +151,8 @@ async def send_MODEL_ACCURACY(manager: Manager):
     writer.close()
 
     if manager.round_ID == 0:
+        models_dir = "Thread/Worker/Data/Models"
+        torch.save(manager.trainer.local_model, f"{models_dir}/{manager.round_number}.pth")
         manager.accuracy_to_summary()
     
     # Clear memory after sending model accuracy to free up RAM

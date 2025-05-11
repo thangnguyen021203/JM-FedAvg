@@ -99,3 +99,20 @@ class Helper:
         # Receive data
         data = await reader.readexactly(data_len)
         return data
+    
+    def get_device():
+        """Return the best available device based on env setting (CUDA GPU if available and enabled, otherwise CPU)"""
+        try:
+            import torch
+            use_gpu = Helper.get_env_variable("USE_GPU")
+            if use_gpu and torch.cuda.is_available():
+                device = torch.device("cuda")
+                print(f"GPU device available: {torch.cuda.get_device_name(0)}")
+                print(f"GPU memory allocated: {torch.cuda.memory_allocated(0) / 1024**2:.2f} MB")
+                print(f"GPU memory reserved: {torch.cuda.memory_reserved(0) / 1024**2:.2f} MB")
+                return device
+            else:
+                return torch.device("cpu")
+        except (KeyError, FileNotFoundError):
+            # Fall back to CPU if setting not found or file not accessible
+            return torch.device("cpu")
